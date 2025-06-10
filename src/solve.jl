@@ -43,7 +43,7 @@ function solve_mf!(
         println(varargs)
         println("Cost = ", cost)
         println("Cost terms = ", cost_terms)
-        println("Free energy = ", fe)
+        println("Free energy         = ", fe)
         println("Free energy (T = 0) = ", fe0)
     end
     # println()
