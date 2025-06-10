@@ -87,7 +87,7 @@ $$
 
 ## Using Lattice Basis Vectors
 
-In a $d$-dimensional Bravais lattice (can contain multiple sites in one unit cell), the lattice basis vereciprocal lattice basis vectors are related by
+In a $d$-dimensional Bravais lattice (can contain multiple sites in one unit cell), the lattice basis vectors and the reciprocal lattice basis vectors are related by
 
 $$
 \begin{equation}
@@ -120,7 +120,7 @@ $$
 \end{equation}
 $$
 
-As the number of unit cells $N \to \infty$, the momenta in the 1st Brillouin zone become continous. The summation over them becomes an integration:
+As the number of unit cells $N \to \infty$, the momenta in the 1st Brillouin zone become continuous. The summation over them becomes an integration:
 
 $$
 \begin{equation}
