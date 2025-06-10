@@ -1,0 +1,20 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Format Julia Code",
+            "type": "shell",
+            "command": "julia",
+            "args": [
+                // "--project=.",
+                "-e",
+                "using JuliaFormatter; format(\".\", verbose=true)"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": []
+        }
+    ]
+}
