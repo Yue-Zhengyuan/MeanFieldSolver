@@ -1,6 +1,6 @@
 """
 Slave fermion mean field t-J model,
-on bipartite lattice with canted ansatz.
+on 2D bipartite lattice with canted ansatz.
 
 # Lattice basis vectors (under Cartesian basis)
 
@@ -23,15 +23,15 @@ The nearest neighbor distance is taken as 1.
 
 # Reference
 
-Physical Review B 111, 174518 (2025)
+Physical Review B 111, 174518 (arXiv 2301.02274)
 """
 @kwdef struct tJCantedAB <: MeanFieldModel
     # Brillouin zone
     bz::BrillouinZone{2} = BrillouinZone((64, 64))
-    # nearest neighbor vectors (under lattice basis)
-    del::Matrix{Float64} = hcat([0.0, 0.0], [0.0, -1.0], [1.0, -1.0])
+    # nearest unit cell vectors (under lattice basis)
+    nbs::Matrix{Float64} = hcat([0.0, 0.0], [0.0, -1.0], [1.0, -1.0])
     # model parameters
-    args::Dict{Symbol}
+    args::Dict{Symbol, Float64}
 end
 
 module _tJCantedAB
@@ -42,7 +42,7 @@ module _tJCantedAB
     using MeanFieldSolver.MFUtils
 
     function gamma(k, model::tJCantedAB)
-        return sum(cis(2π * k' * e) for e in eachcol(model.del))
+        return sum(cis(2π * k' * e) for e in eachcol(model.nbs))
     end
 
     function cal_p(model::tJCantedAB)
@@ -103,14 +103,14 @@ module _tJCantedAB
     at which the spinons become gapless
     """
     function cal_λ0(model::tJCantedAB)
-        z = size(model.del, 2)
+        z = size(model.nbs, 2)
         λ0 = sqrt(cal_p(model)^2 + cal_q(model)^2) * z
         return λ0
     end
 
     function free_energy(model::tJCantedAB)
         @unpack t, J, β, δ, A, B, D, μ, dλ = model.args
-        z = size(model.del, 2)
+        z = size(model.nbs, 2)
         N = prod(size(model.bz))
         κ = 1 - δ
         λ = sqrt(cal_λ0(model)^2 + dλ^2)
@@ -135,7 +135,7 @@ module _tJCantedAB
 
     function mf_equations(model::tJCantedAB)
         @unpack J, β, δ, A, B, D, μ, dλ = model.args
-        z = size(model.del, 2)
+        z = size(model.nbs, 2)
         N = prod(size(model.bz))
         κ = 1 - δ
         @assert A >= 0

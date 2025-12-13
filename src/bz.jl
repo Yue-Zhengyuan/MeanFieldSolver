@@ -57,3 +57,10 @@ function BrillouinZone(Ns::NTuple{D, Int}) where {D}
 end
 
 Base.size(bz::BrillouinZone) = bz.Ns
+
+"""
+Calculate the mean value of `func(k)` in the BrillouinZone `bz`
+"""
+function sum_bz(func, bz::BrillouinZone)
+    return sum(func.(bz.ks)) / prod(size(bz))
+end
