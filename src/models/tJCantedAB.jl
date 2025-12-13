@@ -60,22 +60,22 @@ module _tJCantedAB
         return t * B
     end
 
-    function xi_b(k, model::tJCantedAB)
+    function xi_b(k::Vector{Float64}, model::tJCantedAB)
         p = cal_p(model)
         return p * gamma(k, model)
     end
 
-    function xi_f(k, model::tJCantedAB)
+    function xi_f(k::Vector{Float64}, model::tJCantedAB)
         r = cal_r(model)
         return 2 * r * gamma(k, model)
     end
 
-    function Delta(k, model::tJCantedAB)
+    function Delta(k::Vector{Float64}, model::tJCantedAB)
         q = cal_q(model)
         return q * gamma(k, model)
     end
 
-    function chi(k, model::tJCantedAB)
+    function chi(k::Vector{Float64}, model::tJCantedAB)
         λ = model.args[:λ]
         chi_k2 = λ^2 - abs2(Delta(k, model))
         # if round(chi_k2; digits=14) == 0
@@ -84,13 +84,13 @@ module _tJCantedAB
         return sqrt(chi_k2)
     end
 
-    function Energy_f(k, model::tJCantedAB)
+    function Energy_f(k::Vector{Float64}, model::tJCantedAB)
         ξf = abs(xi_f(k, model))
         μ = model.args[:μ]
         return ξf - μ, -ξf - μ
     end
 
-    function Energy_b(k, model::tJCantedAB)
+    function Energy_b(k::Vector{Float64}, model::tJCantedAB)
         ξb = abs(xi_b(k, model))
         χ = chi(k, model)
         Eb_A, Eb_B = ξb + χ, -ξb + χ

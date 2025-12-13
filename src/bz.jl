@@ -59,7 +59,8 @@ end
 Base.size(bz::BrillouinZone) = bz.Ns
 
 """
-Calculate the mean value of `func(k)` in the BrillouinZone `bz`
+Calculate the mean value of `func(k)`
+in the discrete BrillouinZone `bz`
 """
 function sum_bz(func, bz::BrillouinZone)
     return sum(func.(bz.ks)) / prod(size(bz))
