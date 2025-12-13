@@ -62,5 +62,5 @@ function solve_mf!(
         println("Free energy (T = 0) = ", fe0)
     end
     println(@sprintf("Time elapsed: %.3f s", time1 - time0))
-    return cost, cost_terms, fe
+    return cost, cost_terms, fe, model
 end
