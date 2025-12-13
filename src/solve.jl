@@ -1,51 +1,66 @@
+"""
+Mean field self consistency equations for `model`.
+"""
+function mf_equations(model::MeanFieldModel)
+    error("A set of mean field equations should be provided for each specific model.")
+end
+
+"""
+Mean field free energy per lattice unit cell for `model`.
+"""
+function free_energy(model::MeanFieldModel)
+    error("The expression of free energy should be provided for each specific model.")
+end
+
 function solve_mf!(
-    varargs::OrderedDict{Symbol,Float64},
-    fixargs::OrderedDict{Symbol,Float64},
-    model;
-    verbose::Bool=true,
-)
+        model::M, varkeys::Vector{Symbol};
+        verbose::Bool = true,
+    ) where {M <: MeanFieldModel}
+    time0 = time()
     if verbose
         println("Solving...")
-        println("Variables:\n", varargs)
-        println("Fixed parameters:\n", fixargs)
+        println("Variables:\n", varkeys)
+        println("Initial parameters:\n", model.args)
     end
-    varkeys = keys(varargs)
-    x0 = collect(values(varargs))
-    allargs = merge(varargs, fixargs)
+    x0 = collect(model.args[v] for v in varkeys)
 
     function target(x)
-        args = allargs
         for (key, val) in zip(varkeys, x)
-            args[key] = val
+            model.args[key] = val
         end
-        return model.mf_equations(args)[2]
+        return first(mf_equations(model))
     end
 
-    result = Optim.optimize(target, x0, Optim.Options(; g_tol=1e-15))
-    # solution 
+    result = Optim.optimize(target, x0, Optim.Options(; g_tol = 1.0e-15))
+    # solution
     x = Optim.minimizer(result)
     # cost function
     cost = Optim.minimum(result)
-    # cost terms
-    for (key, val) in zip(keys(varargs), x)
-        varargs[key] = val
-        allargs[key] = val
+    # fill solution into model.args
+    for (key, val) in zip(varkeys, x)
+        model.args[key] = val
     end
-    cost_terms = model.mf_equations(allargs)[1]
+    cost_terms = first(mf_equations(model))
     # free energy
-    fe = model.free_energy(allargs)
-    allargs2 = deepcopy(allargs)
-    allargs2[:β] = Inf
-    fe0 = model.free_energy(allargs2)
+    fe = free_energy(model)
+    # free energy at T = 0
+    β0 = model.args[:β]
+    model.args[:β] = Inf
+    fe0 = free_energy(model)
+    # restore temperature
+    model.args[:β] = β0
+    time1 = time()
     if verbose
         println("----------------")
-        println("Optimization finished")
-        println(varargs)
+        println("Optimization finished. Solution:")
+        for (k, v) in zip(varkeys, x)
+            println("   ", k => v)
+        end
         println("Cost = ", cost)
         println("Cost terms = ", cost_terms)
         println("Free energy         = ", fe)
         println("Free energy (T = 0) = ", fe0)
     end
-    # println()
+    println(@sprintf("Time elapsed: %.3f s", time1 - time0))
     return cost, cost_terms, fe
 end

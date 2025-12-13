@@ -4,7 +4,7 @@ export theta, log1pexp, log1mexp
 export nb, nf, mysgn, myphase
 
 "step function"
-theta(x) = (x > 1e-16) ? 1 : 0
+theta(x) = (x > 1.0e-16) ? 1 : 0
 
 "Calculate `log(1 + exp(x))`"
 function log1pexp(x)

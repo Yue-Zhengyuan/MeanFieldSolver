@@ -51,5 +51,9 @@ end
 function BrillouinZone(Ns::NTuple{D, Int}, pbcs::Bool) where {D}
     return BrillouinZone(Ns, ntuple(_ -> pbcs, D))
 end
+function BrillouinZone(Ns::NTuple{D, Int}) where {D}
+    # assuming PBC on all dimensions
+    return BrillouinZone(Ns, ntuple(_ -> true, D))
+end
 
 Base.size(bz::BrillouinZone) = bz.Ns

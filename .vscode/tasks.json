@@ -4,12 +4,7 @@
         {
             "label": "Format Julia Code",
             "type": "shell",
-            "command": "julia",
-            "args": [
-                // "--project=.",
-                "-e",
-                "using JuliaFormatter; format(\".\", verbose=true)"
-            ],
+            "command": "runic --inplace .",
             "group": {
                 "kind": "build",
                 "isDefault": true
