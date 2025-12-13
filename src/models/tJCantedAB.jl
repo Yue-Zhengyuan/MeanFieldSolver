@@ -25,7 +25,7 @@ The nearest neighbor distance is taken as 1.
 
 Physical Review B 111, 174518 (2025)
 """
-@kwdef struct tJCantedBipartite <: MeanFieldModel
+@kwdef struct tJCantedAB <: MeanFieldModel
     # Brillouin zone
     bz::BrillouinZone{2} = BrillouinZone((64, 64))
     # nearest neighbor vectors (under lattice basis)
@@ -34,48 +34,48 @@ Physical Review B 111, 174518 (2025)
     args::Dict{Symbol}
 end
 
-module _tJCantedBipartite
+module _tJCantedAB
 
     using Parameters
     using LinearAlgebra
-    using MeanFieldSolver: tJCantedBipartite
+    using MeanFieldSolver: tJCantedAB
     using MeanFieldSolver.MFUtils
 
-    function gamma(k, model::tJCantedBipartite)
+    function gamma(k, model::tJCantedAB)
         return sum(cis(2π * k' * e) for e in eachcol(model.del))
     end
 
-    function cal_p(model::tJCantedBipartite)
+    function cal_p(model::tJCantedAB)
         @unpack t, J, B, D = model.args
         return t * D + J * B / 2
     end
 
-    function cal_q(model::tJCantedBipartite)
+    function cal_q(model::tJCantedAB)
         @unpack J, A = model.args
         return J * A
     end
 
-    function cal_r(model::tJCantedBipartite)
+    function cal_r(model::tJCantedAB)
         @unpack t, J, B, D = model.args
         return t * B
     end
 
-    function xi_b(k, model::tJCantedBipartite)
+    function xi_b(k, model::tJCantedAB)
         p = cal_p(model)
         return p * gamma(k, model)
     end
 
-    function xi_f(k, model::tJCantedBipartite)
+    function xi_f(k, model::tJCantedAB)
         r = cal_r(model)
         return 2 * r * gamma(k, model)
     end
 
-    function Delta(k, model::tJCantedBipartite)
+    function Delta(k, model::tJCantedAB)
         q = cal_q(model)
         return q * gamma(k, model)
     end
 
-    function chi(k, model::tJCantedBipartite)
+    function chi(k, model::tJCantedAB)
         λ = model.args[:λ]
         chi_k2 = λ^2 - abs2(Delta(k, model))
         # if round(chi_k2; digits=14) == 0
@@ -84,13 +84,13 @@ module _tJCantedBipartite
         return sqrt(chi_k2)
     end
 
-    function Energy_f(k, model::tJCantedBipartite)
+    function Energy_f(k, model::tJCantedAB)
         ξf = abs(xi_f(k, model))
         μ = model.args[:μ]
         return ξf - μ, -ξf - μ
     end
 
-    function Energy_b(k, model::tJCantedBipartite)
+    function Energy_b(k, model::tJCantedAB)
         ξb = abs(xi_b(k, model))
         χ = chi(k, model)
         Eb_A, Eb_B = ξb + χ, -ξb + χ
@@ -102,13 +102,13 @@ module _tJCantedBipartite
     Calculate critical value of the spinon chemical potential λ 
     at which the spinons become gapless
     """
-    function cal_λ0(model::tJCantedBipartite)
+    function cal_λ0(model::tJCantedAB)
         z = size(model.del, 2)
         λ0 = sqrt(cal_p(model)^2 + cal_q(model)^2) * z
         return λ0
     end
 
-    function free_energy(model::tJCantedBipartite)
+    function free_energy(model::tJCantedAB)
         @unpack t, J, β, δ, A, B, D, μ, dλ = model.args
         z = size(model.del, 2)
         N = prod(size(model.bz))
@@ -133,7 +133,7 @@ module _tJCantedBipartite
         return fe
     end
 
-    function mf_equations(model::tJCantedBipartite)
+    function mf_equations(model::tJCantedAB)
         @unpack J, β, δ, A, B, D, μ, dλ = model.args
         z = size(model.del, 2)
         N = prod(size(model.bz))
@@ -163,7 +163,5 @@ module _tJCantedBipartite
 
 end
 
-import ._tJCantedBipartite
-
-mf_equations(model::tJCantedBipartite) = _tJCantedBipartite.mf_equations(model)
-free_energy(model::tJCantedBipartite) = _tJCantedBipartite.free_energy(model)
+mf_equations(model::tJCantedAB) = _tJCantedAB.mf_equations(model)
+free_energy(model::tJCantedAB) = _tJCantedAB.free_energy(model)

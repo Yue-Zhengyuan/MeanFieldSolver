@@ -15,7 +15,7 @@ include("utils.jl")
 include("bz.jl")
 include("solve.jl")
 
-include("models/tJCantedBipartite.jl")
+include("models/tJCantedAB.jl")
 include("models/BCSSpinlessFermion.jl")
 
 end
