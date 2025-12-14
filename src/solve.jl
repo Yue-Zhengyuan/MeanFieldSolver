@@ -12,15 +12,32 @@ function free_energy(model::MeanFieldModel)
     error("The expression of free energy should be provided for each specific model.")
 end
 
+
+"""
+    solve_mf!(
+        model::M, varkeys::Vector{Symbol};
+        verbose::Bool = true,
+        optimizer = (target, x0) -> Optim.optimize(target, x0)
+    ) where {M <: MeanFieldModel}
+
+Mean field self-consistency equation solver. 
+The optimization algorithm is specified by the function `optimizer`,
+which takes two arguments `target` (the self-consistency equation cost)
+and `x0` (initial guess of the mean field solution).
+"""
 function solve_mf!(
         model::M, varkeys::Vector{Symbol};
         verbose::Bool = true,
+        optimizer = (target, x0) -> Optim.optimize(target, x0)
     ) where {M <: MeanFieldModel}
     time0 = time()
     if verbose
-        println("Solving...")
-        println("Variables:\n", varkeys)
-        println("Initial parameters:\n", model.args)
+        println("Solving self-consistency equations...")
+        println("Initial parameters:")
+        for k in sort(collect(keys(model.args)))
+            println("   ", k => model.args[k])
+        end
+        println("Variables: ", varkeys)
     end
     x0 = collect(model.args[v] for v in varkeys)
 
@@ -30,8 +47,7 @@ function solve_mf!(
         end
         return first(mf_equations(model))
     end
-
-    result = Optim.optimize(target, x0, Optim.Options(; g_tol = 1.0e-15))
+    result = optimizer(target, x0)
     # solution
     x = Optim.minimizer(result)
     # cost function
@@ -40,7 +56,7 @@ function solve_mf!(
     for (key, val) in zip(varkeys, x)
         model.args[key] = val
     end
-    cost_terms = first(mf_equations(model))
+    cost_terms = mf_equations(model)[2]
     # free energy
     fe = free_energy(model)
     # free energy at T = 0
@@ -56,9 +72,9 @@ function solve_mf!(
         for (k, v) in zip(varkeys, x)
             println("   ", k => v)
         end
-        println("Cost = ", cost)
-        println("Cost terms = ", cost_terms)
-        println("Free energy         = ", fe)
+        println("               Cost = ", cost)
+        println("         Cost terms = ", cost_terms)
+        println("        Free energy = ", fe)
         println("Free energy (T = 0) = ", fe0)
     end
     println(@sprintf("Time elapsed: %.3f s", time1 - time0))
