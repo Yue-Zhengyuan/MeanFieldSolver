@@ -234,7 +234,7 @@ module _BCSSpinless
         else
             xs2 - xs1
         end
-        return norm(diff), diff
+        return norm(diff)^2, diff
     end
 
     function freeE_k(k::Vector{Float64}, model::BCSSpinlessFermion)

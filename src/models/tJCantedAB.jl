@@ -158,7 +158,7 @@ module _tJCantedAB
             eqs[5] += (D == 0) ? 0 : (nf_A - nf_B) * γ / (2 * z * N)
         end
         eqs -= [δ, κ, A, sp * B, sr * D]
-        return norm(eqs), eqs
+        return norm(eqs)^2, eqs
     end
 
 end

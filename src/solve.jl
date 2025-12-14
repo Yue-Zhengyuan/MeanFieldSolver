@@ -17,18 +17,18 @@ end
     solve_mf!(
         model::M, varkeys::Vector{Symbol};
         verbose::Bool = true,
-        optimizer = (target, x0) -> Optim.optimize(target, x0)
+        optimizer = (f, x0) -> Optim.optimize(f, x0)
     ) where {M <: MeanFieldModel}
 
 Mean field self-consistency equation solver. 
 The optimization algorithm is specified by the function `optimizer`,
-which takes two arguments `target` (the self-consistency equation cost)
+which takes two arguments `f` (the self-consistency equation cost)
 and `x0` (initial guess of the mean field solution).
 """
 function solve_mf!(
         model::M, varkeys::Vector{Symbol};
         verbose::Bool = true,
-        optimizer = (target, x0) -> Optim.optimize(target, x0)
+        optimizer = (f, x0) -> Optim.optimize(f, x0)
     ) where {M <: MeanFieldModel}
     time0 = time()
     if verbose
