@@ -219,11 +219,15 @@ module _BCSSpinless
         return (-1.0im * g / 2) * Delta_k / E_k * (1 - 2n_k) * sin(2 * π * k' * η)
     end
 
-    function mf_equations(model::BCSSpinlessFermion)
-        Δs2 = collect(
+    function cal_Δs(model::BCSSpinlessFermion)
+        return collect(
             sum_bz(k -> cal_Δk(k, i, model), model.bz) for i in 1:size(model.nbs, 2)
         )
+    end
+
+    function mf_equations(model::BCSSpinlessFermion)
         xs1 = collect_xs(model)
+        Δs2 = cal_Δs(model)
         xs2 = get_xs(Δs2, model.lattice, model.pairing)
         diff = if model.force_pairing
             1 .- (xs2 ./ xs1)
